@@ -161,8 +161,8 @@ public class GF2GIFs {
     usage();
 
     System.out.println();
-    System.out.println("  -bg background:     use six hex bytes to specify the background color");
-    System.out.println("  -fg foreground:     use six hex bytes to specify the foreground color");
+    System.out.println("  -bg background:     use three hex bytes to specify the background color");
+    System.out.println("  -fg foreground:     use three hex bytes to specify the foreground color");
     System.out.println("  -d targetdirectory: put the GIF images in the specified directory");
     System.out.println("  -p fileprefix:      GIF file names will be fileprefixNNN.gif,");
     System.out.println("                      where NNN is the character code");

@@ -28,7 +28,8 @@ package com.slurm.gf;
 import java.io.*;
 import java.awt.*;
 import java.awt.image.*;
-import Acme.JPM.Encoders.*;
+
+import javax.imageio.ImageIO;
 
 /**
  * Set of callback functions to create GIF images of characters
@@ -59,7 +60,6 @@ public class GF2GIFCallback extends GFParserCallback {
 
   int characterCode;
   MemoryImageSource mis;
-  ImageEncoder encoder;
   String filePrefix;
 
   /**
@@ -86,6 +86,15 @@ public class GF2GIFCallback extends GFParserCallback {
 
     width = 0;
     height = 0;
+
+    if (hasTransparent) {
+      if (transparentBackground) {
+        background = Color.black;
+      }
+      else {
+        foreground = Color.black;
+      }
+    }
 
     byte[] redMap = { (byte)(background.getRed()),
                       (byte)(foreground.getRed()) };
@@ -227,9 +236,13 @@ public class GF2GIFCallback extends GFParserCallback {
       }
 
       mis = new MemoryImageSource(width, extendedHeight, colorModel, extendedPixels, 0, width);
-    
-      encoder = new GifEncoder(mis, new FileOutputStream(filePrefix + characterCode + ".gif"));
-      encoder.encode();
+
+      Image image = Toolkit.getDefaultToolkit().createImage(mis);
+      BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+      bufferedImage.getGraphics().drawImage(image, 0, 0, null);
+
+      ImageIO.write(bufferedImage, "gif", new File(filePrefix + characterCode + ".gif"));
+
     }
     catch (FileNotFoundException fnfe) {
       System.out.println("! could not create file " + filePrefix + characterCode + ".gif");

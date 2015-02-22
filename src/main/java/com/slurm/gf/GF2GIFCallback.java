@@ -28,6 +28,7 @@ package com.slurm.gf;
 import java.io.*;
 import java.awt.*;
 import java.awt.image.*;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
@@ -79,50 +80,36 @@ public class GF2GIFCallback extends GFParserCallback {
    * @param targetDirectory the directory in which to put the GIF files.
    */
   public GF2GIFCallback(Color foreground, Color background, boolean hasTransparent, boolean transparentBackground, int minHeight, int maxHeight, String filePrefix, String targetDirectory) {
-    paintSwitch = WHITE;
-    m = 0;
-    n = 0;
-    totalChars = 0;
+      paintSwitch = WHITE;
+      m = 0;
+      n = 0;
+      totalChars = 0;
 
-    width = 0;
-    height = 0;
+      width = 0;
+      height = 0;
 
-    if (hasTransparent) {
-      if (transparentBackground) {
-        background = Color.black;
+      byte[] redMap = {(byte) (background.getRed()), (byte) (foreground.getRed())};
+      byte[] greenMap = {(byte) (background.getGreen()), (byte) (foreground.getGreen())};
+      byte[] blueMap = {(byte) (background.getBlue()), (byte) (foreground.getBlue())};
+
+      if (hasTransparent) {
+          if (transparentBackground) {
+              colorModel = new IndexColorModel(1, 2, redMap, greenMap, blueMap, 0);
+          } else {
+              colorModel = new IndexColorModel(1, 2, redMap, greenMap, blueMap, 1);
+          }
+      } else {
+          colorModel = new IndexColorModel(1, 2, redMap, greenMap, blueMap);
       }
-      else {
-        foreground = Color.black;
-      }
-    }
 
-    byte[] redMap = { (byte)(background.getRed()),
-                      (byte)(foreground.getRed()) };
-    byte[] greenMap = { (byte)(background.getGreen()),
-                        (byte)(foreground.getGreen()) };
-    byte[] blueMap = { (byte)(background.getBlue()),
-                       (byte)(foreground.getBlue()) };
-    if (hasTransparent) {
-      if (transparentBackground) {
-        colorModel = new IndexColorModel(1, 2, redMap, greenMap, blueMap, 0);
-      }
-      else {
-        colorModel = new IndexColorModel(1, 2, redMap, greenMap, blueMap, 1);
-      }
-    }
-    else {
-      colorModel = new IndexColorModel(1, 2, redMap, greenMap, blueMap);
-    }
+      this.minHeight = minHeight;
+      this.maxHeight = maxHeight;
 
-    this.minHeight = minHeight;
-    this.maxHeight = maxHeight;
-
-    if (!targetDirectory.equals("")) {
-      this.filePrefix = targetDirectory + File.separatorChar + filePrefix;
-    }
-    else {
-      this.filePrefix = filePrefix;
-    }
+      if (!targetDirectory.equals("")) {
+          this.filePrefix = targetDirectory + File.separatorChar + filePrefix;
+      } else {
+          this.filePrefix = filePrefix;
+      }
   }
 
   public GF2GIFCallback(Color foreground, Color background, boolean hasTransparent, boolean transparentBackground, String filePrefix, String targetDirectory) {
@@ -235,11 +222,17 @@ public class GF2GIFCallback extends GFParserCallback {
         }
       }
 
-      mis = new MemoryImageSource(width, extendedHeight, colorModel, extendedPixels, 0, width);
+        BufferedImage bufferedImage = new BufferedImage(width, extendedHeight, BufferedImage.TYPE_BYTE_INDEXED, colorModel);
 
-      Image image = Toolkit.getDefaultToolkit().createImage(mis);
-      BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-      bufferedImage.getGraphics().drawImage(image, 0, 0, null);
+        WritableRaster writableRaster = bufferedImage.getRaster();
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < extendedHeight; y++) {
+                int[] fill = new int[1]; // A large block...
+                Arrays.fill(fill, extendedPixels[(y * width) + x]);  // ..  filled with one of the 7 first colors in the LUT.
+                writableRaster.setSamples(x, y, 1, 1, 0, fill);
+            }
+        }
 
       ImageIO.write(bufferedImage, "gif", new File(filePrefix + characterCode + ".gif"));
 

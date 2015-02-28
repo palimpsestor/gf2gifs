@@ -1,81 +1,59 @@
-This directory contains Java class files and source code for the
-GF2GIFs program, a strangely pointless program that converts
-the "generic font" files output by METAFONT into sets of GIF images.
 
-This is version 1.0 of GF2GIFs, indicating that it is the first
-(and possibly only) public release of this software.  The current
-version should be available at http://www.slurm.com/gf2gifs/.
-
+GF2GIFs converts the "generic font" files output by METAFONT into sets of GIF images.
 
 REQUIREMENTS
 
-  1) GF2GIFs is a Java application.  In order to run GF2GIFs, you
-	will need a Java runtime environment.  GF2GIFs was built
-	using the Linux version of Java 1.2.2 available from
-	http://www.blackdown.org.  The code doesn't do anything
-	so radical that it should not run in other Java environments,
-	but it has not been thoroughly tested in other environments
-	so of course your mileage may vary.
-
-  2) The GF2GIFs program depends on Jef Poskanzer's fine GIF encoder,
-	available from http://www.acme.com.
+  GF2GIFs is a Java application.  In order to run GF2GIFs, you
+  will need a (modern) Java runtime environment.
 
 
 CONTENTS
 
-  README	this file
+  README	This file.
 
-  apidoc	the Javadoc documentation for the Java classes
-		that comprise GF2GIFs (as well as a bonus Java
-		implementation of the gftype program)
+  pom.xml   The maven pom file for this project.
 
-  com.jar	the Java class files for the program(s)
-
-  samples	two sample generic font files that were output
-		from METAFONT: io.2602gf is the result of running
-		METAFONT on io.mf as explained in Chapter 5 of
-		Donald Knuth's METAFONTbook; bcmr17.118gf results
-		from a special backwards version of Knuth's own
-		Computer Modern Roman 17 point.  (See
-		http://www.slurm.com/gf2gifs/backwards/ for details.)
+  samples	Two sample generic font files that were output
+		    from METAFONT: io.2602gf is the result of running
+		    METAFONT on io.mf as explained in Chapter 5 of
+		    Donald Knuth's METAFONTbook; bcmr17.118gf results
+		    from a special backwards version of Knuth's own
+		    Computer Modern Roman 17 point.  (See
+		    http://www.slurm.com/gf2gifs/backwards/ for details.)
 
   src		The Java source code for the program(s).
 
 
 INSTALLATION
 
-  If you are reading this file, you have essentially already
-  installed the GF2GIFs program (as well as GFType, a Java
-  implementation of David Fuchs' gftype program).
-
-  In order to run GF2GIFs, you will also need to install the
-  Acme Java package (available at http://www.acme.com), or at least
-  enough of it to support the Acme.JPM.Encoders.GifEncoder class.
-
-  You should add com.jar, as well as the Acme classes, to your
-  CLASSPATH.
+  This version of GF2GIFs was build as a maven project.  To compile, from within the installation directory, run
+    mvn compile
+  Then
+    mvn package
+  will produce a gf2gifs-1.1.0.jar file in the 'target' subdirectory.
 
 USAGE
 
-  Once the com.jar file and the Acme package are included in your CLASSPATH,
+  Once you have produced the gf2gifs-1.1.0.jar file,
   you should be able to invoke the GF2GIFs program by typing
 
-	java com.slurm.gf.GF2GIFs --help
+    mvn -e exec:java -Dexec.mainClass=com.slurm.gf.GF2GIFs -Dexec.args="--help"
 
-  at your command line prompt.  This invocation will give you a brief
-  list of the available command line options and their effects.
+  This invocation will give you a brief list of the available command line
+  options and their effects.
 
-  Typical usage might be something like
+  A typical usage might be something like
 
-	java com.slurm.gf.GF2GIFs -tb -d temp io.2602gf
+    mkdir temp
+    mvn -e exec:java -Dexec.mainClass=com.slurm.gf.GF2GIFs -Dexec.args="-tb -d temp samples/io.2602gf"
 
   This invocation would create two GIF images (one for each
   character in the io font) with transparent backgrounds, and place
-  them in the "temp" subdirectory of the current working directory.
+  them in the newly created 'temp' subdirectory.
 
 CONTACT
 
   If you encounter problems with GF2GIFs, or on the off chance that
   you find GF2GIFs useful or enjoyable, please do not hesitate to
-  contact its author, Richard Blaylock <blaylock@slurm.com>.
+  contact its author, Richard Blaylock <gf2gifs@slurm.com>.
 
